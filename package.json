@@ -1,0 +1,19 @@
+﻿{
+    "name":  "basilur-wastage-dashboard",
+    "version":  "1.0.0",
+    "private":  true,
+    "type":  "module",
+    "scripts":  {
+                    "start":  "node --env-file=.env server.js",
+                    "test":  "node --test tests/*.test.js",
+                    "inspect-db":  "node --env-file=.env scripts/inspect-db.js",
+                    "test:browser":  "node scripts/browser-test.js",
+                    "test:live":  "node --env-file=.env scripts/verify-live.js"
+                },
+    "dependencies":  {
+                         "mssql":  "^12.0.0"
+                     },
+    "devDependencies":  {
+                            "@playwright/test":  "^1.55.0"
+                        }
+}

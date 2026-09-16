@@ -1,0 +1,32 @@
+import { chromium } from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage({viewport:{width:1512,height:1050}});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+try {
+ await page.goto('http://127.0.0.1:3000');
+ await page.waitForFunction(()=>document.querySelector('#status').textContent==='ERP connected'||!document.querySelector('#error').hidden,{},{timeout:180000});
+ assert.equal(await page.locator('#error').isVisible(),false,await page.locator('#error').textContent());
+ assert.ok(await page.locator('.item-row').count()>0,'Live data is visible');
+ await page.screenshot({path:'test-results/dashboard-desktop.png',fullPage:true});
+ await page.locator('.row-toggle').first().click();assert.equal(await page.locator('.month-row').count(),12);
+ await page.locator('#collapse').click();assert.equal(await page.locator('.month-row').count(),0);
+ const item=await page.locator('.item-code').first().textContent();
+ await page.locator('#search').fill(item);assert.equal(await page.locator('.item-row').count(),1);
+ await page.locator('#expand').click();assert.equal(await page.locator('.month-row').count(),12);
+ await page.locator('#from').selectOption('2');await page.locator('#to').selectOption('3');assert.equal(await page.locator('.month-row').count(),2);
+ const downloadEvent=page.waitForEvent('download');await page.locator('#export').click();const download=await downloadEvent;assert.ok(download.suggestedFilename().endsWith('.csv'));
+ await page.locator('#search').fill('ZZZ-NO-SUCH-MATERIAL-123');assert.ok((await page.locator('#table-body').textContent()).includes('No materials'));assert.equal(await page.locator('#export').isDisabled(),true);
+ await page.locator('#reset').click();assert.ok(await page.locator('.item-row').count()>0);
+ assert.equal(await page.locator('#category-mode').count(),0);
+ await page.locator('[data-month="2"]').click();assert.equal(await page.locator('#from').inputValue(),'2');assert.equal(await page.locator('#to').inputValue(),'2');
+ await page.locator('#reset').click();await page.setViewportSize({width:390,height:844});await page.screenshot({path:'test-results/dashboard-mobile.png',fullPage:true});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile page has no horizontal overflow');
+ assert.deepEqual(errors,[]);
+ for(const path of ['/.env','/db.js','/package.json','/api/missing']) assert.equal((await page.request.get(`http://127.0.0.1:3000${path}`)).status(),404);
+ assert.equal((await page.request.get('http://127.0.0.1:3000/api/report?year=2026%27')).status(),400);
+ assert.equal((await page.request.post('http://127.0.0.1:3000/api/report?year=2026')).status(),405);
+ await page.route('**/api/report*',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Test database connection failure'})}));
+ await page.locator('#refresh').click();await page.locator('#error').waitFor();assert.equal(await page.locator('#export').isDisabled(),true);assert.equal(await page.locator('#issued').textContent(),'—');
+ console.log('PASS: live data, drill-down/up, filters, date range, CSV, empty state, FLV group only, chart interaction, mobile layout, secret isolation, validation, error state.');
+} finally {await browser.close();}

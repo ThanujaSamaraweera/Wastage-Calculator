@@ -1,0 +1,5 @@
+﻿Tool: built-in image_gen (background-extraction edit).
+Input: public/assets/basilur.jpg
+Output: public/assets/basilur-transparent.png
+
+Use case: background-extraction. Edit target: supplied Basilur brand logo. Remove ONLY the solid black exterior background, replacing it with true alpha transparency in a PNG. Preserve the gold tea leaves, ornate crest, maroon red panels, white ribbon, white BASILUR lettering, TEA, calligraphic B, EXCLUSIVE PREMIUM QUALITY and gold handwritten 'Way of Tea' exactly as in the source. Keep original composition and proportions; do not redesign or recolor. Preserve internal dark details belonging to the emblem. Remove the small screenshot/search overlay icon at the bottom-right. Trim excessive exterior empty space leaving a modest transparent margin. Asset is for a white dashboard sidebar. No white/black filled background, no checkerboard baked into the pixels. Return saved image file path.

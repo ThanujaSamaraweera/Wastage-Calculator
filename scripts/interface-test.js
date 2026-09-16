@@ -1,0 +1,37 @@
+﻿import { chromium } from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+try {
+ const page=await browser.newPage({viewport:{width:1512,height:1050}}), errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ const year=new Date().getFullYear();
+ const rows=Array.from({length:36},(_,i)=>Array.from({length:12},(_,j)=>({item:`PMENV-${String(i).padStart(3,'0')}`,description:`Envelope material ${i}`,flvGroup:i%2?'Envelopes':'Labels',site:'BTI',month:j+1,issued:1000,waste:100-i,transactions:1}))).flat();
+ await page.route('**/api/metadata',route=>route.fulfill({json:{years:[year,year-1],sites:['BTI']}}));
+ await page.route('**/api/report*',route=>route.fulfill({json:{rows,updatedAt:new Date().toISOString()}}));
+ await page.goto('http://127.0.0.1:3000');
+ await page.waitForFunction(()=>document.querySelector('#status').textContent==='ERP connected');
+ await page.locator('[data-range="2"]').click();assert.equal(await page.locator('#from').inputValue(),'4');assert.equal(await page.locator('#to').inputValue(),'6');
+ await page.locator('[data-clear="period"]').click();assert.equal(await page.locator('#to').inputValue(),'12');
+ await page.locator('[data-range="ytd"]').click();assert.equal(await page.locator('#to').inputValue(),String(new Date().getMonth()+1));
+ await page.locator('#reset').click();
+ await page.locator('[data-group]').first().click();assert.notEqual(await page.locator('#category').inputValue(),'');
+ await page.locator('[data-clear="category"]').click();assert.equal(await page.locator('#category').inputValue(),'');
+ await page.keyboard.press('/');assert.equal(await page.locator('#search').evaluate(e=>e===document.activeElement),true);
+ await page.locator('#search').fill('PMENV-000');assert.equal(await page.locator('.item-row').count(),1);
+ await page.locator('[data-clear="search"]').click();await page.locator('#page-size').selectOption('15');assert.equal(await page.locator('.item-row').count(),15);
+ await page.locator('#next').click();assert.match(await page.locator('#pagination-info').textContent(),/16/);
+ await page.locator('#density').click();assert.equal(await page.locator('#density').getAttribute('aria-pressed'),'true');
+ await page.locator('[data-month="1"]').focus();assert.match(await page.locator('#chart-readout').textContent(),/Issued/);
+ await page.locator('[data-detail]').first().click();assert.equal(await page.locator('#material-dialog').isVisible(),true);assert.equal(await page.locator('#detail-content tbody tr').count(),12);
+ await page.keyboard.press('Escape');assert.equal(await page.locator('#material-dialog').isVisible(),false);
+ await page.screenshot({path:'test-results/interactive-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});await page.locator('[data-detail]').first().click();
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ assert.ok(await page.locator('#material-dialog').evaluate(e=>e.scrollWidth<=e.clientWidth));
+ await page.screenshot({path:'test-results/interactive-detail-mobile.png',fullPage:true});
+ await page.locator('#close-detail').click();
+ assert.equal(await page.locator('.brand').evaluate(e=>getComputedStyle(e).backgroundColor),'rgba(0, 0, 0, 0)');
+ assert.ok(await page.locator('.brand img').evaluate(e=>e.complete&&e.naturalWidth>0));
+ assert.deepEqual(errors,[]);
+ console.log('PASS: quick ranges, filter chips, FLV filtering, keyboard search, pagination, density, chart feedback, material dialog, Escape, mobile overflow, transparent logo, no JavaScript errors.');
+} finally {await browser.close();}
