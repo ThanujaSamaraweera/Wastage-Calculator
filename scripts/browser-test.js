@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 const browser=await chromium.launch({channel:'msedge',headless:true});
 const page=await browser.newPage({viewport:{width:1512,height:1050}});
 const errors=[];page.on('pageerror',e=>errors.push(e.message));
-const port = process.env.PORT || 6000;
+const port = process.env.PORT || 6500;
 const baseUrl = `http://127.0.0.1:${port}`;
 try {
  await page.goto(baseUrl);

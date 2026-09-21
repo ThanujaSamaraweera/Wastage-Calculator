@@ -14,10 +14,10 @@ COPY --chown=node:node public/ ./public/
 # Set environment defaults
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
-    PORT=6000
+    PORT=6500
 
 # Expose application port
-EXPOSE 6000
+EXPOSE 6500
 
 # Run container as non-root node user
 USER node

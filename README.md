@@ -11,7 +11,7 @@ npm install
 npm start
 ```
 
-Open http://127.0.0.1:6000. The existing `.env` supplies `ERP_DB_SERVER`, `ERP_DB_DATABASE`, `ERP_DB_USER` and `ERP_DB_PASSWORD`. Keep that file private; it is ignored by Git and is never served by the application. `.env.example` documents configuration without credentials.
+Open http://127.0.0.1:6500. The existing `.env` supplies `ERP_DB_SERVER`, `ERP_DB_DATABASE`, `ERP_DB_USER` and `ERP_DB_PASSWORD`. Keep that file private; it is ignored by Git and is never served by the application. `.env.example` documents configuration without credentials.
 
 The inspected SQL Server rejected modern TLS. `ERP_DB_ENCRYPT=false` was added to the local `.env` after a successful connection with this setting. This means the database connection is not encrypted; use the trusted organization network/VPN. If SQL Server is upgraded to support TLS, set it to `true`. Certificate validation stays enabled unless explicitly overridden.
 

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { database, sql } from '../db.js';
 import { buildReport } from '../public/report.js';
-const port = process.env.PORT || 6000;
+const port = process.env.PORT || 6500;
 const metadata=await (await fetch(`http://127.0.0.1:${port}/api/metadata`)).json();
 const year=metadata.years[0];
 const data=await (await fetch(`http://127.0.0.1:${port}/api/report?year=${year}&refresh=true`)).json();

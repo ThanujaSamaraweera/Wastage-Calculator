@@ -68,5 +68,5 @@ docker image prune -f
 
 echo "=========================================="
 echo "✅ Basilur Wastage Calculator Deployed Successfully!"
-echo "   - Application running on port 6000"
+echo "   - Application running on port 6500"
 echo "=========================================="
