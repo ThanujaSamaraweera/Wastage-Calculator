@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.example
+tests
+scripts
+test-results
+*.md
+deploy.sh

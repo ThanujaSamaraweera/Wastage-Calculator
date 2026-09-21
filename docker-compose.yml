@@ -1,0 +1,14 @@
+services:
+  wastage-calculator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wastage-calculator
+    restart: always
+    ports:
+      - "6000:6000"
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=6000

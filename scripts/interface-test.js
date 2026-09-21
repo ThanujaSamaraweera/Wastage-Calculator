@@ -1,4 +1,4 @@
-﻿import { chromium } from '@playwright/test';
+import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 const browser=await chromium.launch({channel:'msedge',headless:true});
 try {
@@ -8,7 +8,8 @@ try {
  const rows=Array.from({length:36},(_,i)=>Array.from({length:12},(_,j)=>({item:`PMENV-${String(i).padStart(3,'0')}`,description:`Envelope material ${i}`,flvGroup:i%2?'Envelopes':'Labels',site:'BTI',month:j+1,issued:1000,waste:100-i,transactions:1}))).flat();
  await page.route('**/api/metadata',route=>route.fulfill({json:{years:[year,year-1],sites:['BTI']}}));
  await page.route('**/api/report*',route=>route.fulfill({json:{rows,updatedAt:new Date().toISOString()}}));
- await page.goto('http://127.0.0.1:3000');
+ const port = process.env.PORT || 6000;
+ await page.goto(`http://127.0.0.1:${port}`);
  await page.waitForFunction(()=>document.querySelector('#status').textContent==='ERP connected');
  await page.locator('[data-range="2"]').click();assert.equal(await page.locator('#from').inputValue(),'4');assert.equal(await page.locator('#to').inputValue(),'6');
  await page.locator('[data-clear="period"]').click();assert.equal(await page.locator('#to').inputValue(),'12');
