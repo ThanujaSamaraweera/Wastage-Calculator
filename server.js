@@ -37,5 +37,5 @@ const server = http.createServer(async (req, res) => {
   }
 });
 const host = process.env.HOST || '0.0.0.0', port = Number(process.env.PORT || 6000);
-server.listen(port, host, () => console.log(`Wastage dashboard: http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}`));
+server.listen(port, host, () => console.log(`Wastage dashboard listening on ${host}:${port}`));
 
