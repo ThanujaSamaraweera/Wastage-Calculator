@@ -4,12 +4,12 @@ FROM node:22-alpine
 WORKDIR /app
 
 # Install dependencies (production only)
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 RUN npm ci --omit=dev
 
 # Copy application source code
-COPY server.js db.js repository.js ./
-COPY public/ ./public/
+COPY --chown=node:node server.js db.js repository.js ./
+COPY --chown=node:node public/ ./public/
 
 # Set environment defaults
 ENV NODE_ENV=production \

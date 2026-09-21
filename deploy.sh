@@ -60,8 +60,8 @@ echo "🔄 Building and launching containers..."
 
 cd "$PROJECT_DIR" || exit 1
 
-# Build and start services in detached mode
-docker compose up -d --build
+# Build and start services in detached mode (removing orphan containers)
+docker compose up -d --build --remove-orphans
 
 # Optional: Clean up dangling images to free disk space
 docker image prune -f

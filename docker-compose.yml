@@ -1,9 +1,9 @@
 services:
-  wastage-calculator:
+  app-wastage-calculator:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wastage-calculator
+    container_name: app-wastage-calculator
     restart: always
     ports:
       - "6000:6000"
