@@ -28,4 +28,3 @@ export function buildReport(rows, { year, from = 1, to = 12, search = '', catego
   const issued = items.reduce((sum, item) => sum + item.issued, 0), waste = items.reduce((sum, item) => sum + item.waste, 0);
   return {year, from, to, items, months, totals: {issued, waste, percent: percentage(waste, issued), items: items.length}};
 }
-

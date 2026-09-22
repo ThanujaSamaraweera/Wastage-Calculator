@@ -1,7 +1,49 @@
-﻿.env
+# Dependencies and package-manager caches
+node_modules/
+.npm/
+.pnpm-store/
+
+# Local configuration and credentials
+.env
 .env.*
 !.env.example
-node_modules/
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Logs and runtime files
+*.log
+logs/
+*.pid
+*.pid.lock
+
+# Generated output and test artifacts
+coverage/
+.nyc_output/
 test-results/
 playwright-report/
-*.log
+playwright/.cache/
+dist/
+build/
+.cache/
+tmp/
+temp/
+
+# Local database dumps and exports
+*.bak
+*.sql.gz
+*.sql.zip
+exports/
+
+# Editor and operating-system files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Keep package-lock.json, .env.example, source files, and brand assets tracked.

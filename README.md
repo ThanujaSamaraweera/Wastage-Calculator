@@ -7,7 +7,10 @@ A plain HTML, CSS and JavaScript dashboard backed by a read-only Node.js API for
 Requires Node.js 22+ and network access to the ERP server.
 
 ```powershell
-npm install
+npm ci
+# On a fresh clone only: copy the template, then fill in your local credentials.
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+# Edit .env before starting. Do not overwrite an existing configured .env.
 npm start
 ```
 
@@ -78,3 +81,22 @@ Quarter and year-to-date buttons change the month range. Year to date is availab
 Run `node scripts/interface-test.js` with the local server running to check these interactions with controlled browser fixtures. The standard browser checks continue to use live ERP data.
 
 The transparent Basilur asset is `public/assets/basilur-transparent.png`. The original JPG is retained. The built-in image generation/editing tool was used for background extraction; see `public/assets/basilur-edit-prompt.txt` for the exact prompt. The generated PNG contains true alpha transparency.
+
+
+## Committing to GitHub
+
+Node.js 24 is the suggested version (`.nvmrc`). Commit application source, `package.json`, `package-lock.json`, `.env.example`, documentation, and the assets used by the UI. The repository includes `.gitignore`, `.gitattributes` for consistent line endings, and `.editorconfig` for editor defaults.
+
+Your real `.env`, installed dependencies, generated screenshots/test reports, logs, editor settings, database backups and local exports are ignored. `.env.example` contains placeholders only; configure each installation locally.
+
+Before committing, review the staged changes:
+
+```powershell
+git add .
+git status --short
+git diff --cached --stat
+git diff --cached --check
+git commit -m "Add Basilur wastage dashboard"
+```
+
+Git ignores apply to untracked files. If a private file was already tracked in another checkout, remove it from Git's index with `git rm --cached -- .env` while retaining the local file. This project does not require committing credentials or database extracts. Use a private repository for this internal application unless publication is authorized by the organizations involved.
