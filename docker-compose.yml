@@ -1,0 +1,14 @@
+services:
+  app-wastage-calculator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-wastage-calculator
+    restart: always
+    ports:
+      - "6500:6500"
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=6500

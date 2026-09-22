@@ -36,5 +36,6 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({error:'Unable to load database data. Check your network or VPN and the server database configuration, then retry.'}));
   }
 });
-const host = process.env.HOST || '127.0.0.1', port = Number(process.env.PORT || 3000);
-server.listen(port,host,()=>console.log(`Wastage dashboard: http://${host}:${port}`));
+const host = process.env.HOST || '0.0.0.0', port = Number(process.env.PORT || 6500);
+server.listen(port, host, () => console.log(`Wastage dashboard listening on ${host}:${port}`));
+

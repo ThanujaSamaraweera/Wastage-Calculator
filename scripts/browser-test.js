@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 const browser=await chromium.launch({channel:'msedge',headless:true});
 const page=await browser.newPage({viewport:{width:1512,height:1050}});
 const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const port = process.env.PORT || 6500;
+const baseUrl = `http://127.0.0.1:${port}`;
 try {
- await page.goto('http://127.0.0.1:3000');
+ await page.goto(baseUrl);
  await page.waitForFunction(()=>document.querySelector('#status').textContent==='ERP connected'||!document.querySelector('#error').hidden,{},{timeout:180000});
  assert.equal(await page.locator('#error').isVisible(),false,await page.locator('#error').textContent());
  assert.ok(await page.locator('.item-row').count()>0,'Live data is visible');
@@ -23,9 +25,9 @@ try {
  await page.locator('#reset').click();await page.setViewportSize({width:390,height:844});await page.screenshot({path:'test-results/dashboard-mobile.png',fullPage:true});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile page has no horizontal overflow');
  assert.deepEqual(errors,[]);
- for(const path of ['/.env','/db.js','/package.json','/api/missing']) assert.equal((await page.request.get(`http://127.0.0.1:3000${path}`)).status(),404);
- assert.equal((await page.request.get('http://127.0.0.1:3000/api/report?year=2026%27')).status(),400);
- assert.equal((await page.request.post('http://127.0.0.1:3000/api/report?year=2026')).status(),405);
+ for(const path of ['/.env','/db.js','/package.json','/api/missing']) assert.equal((await page.request.get(`${baseUrl}${path}`)).status(),404);
+ assert.equal((await page.request.get(`${baseUrl}/api/report?year=2026%27`)).status(),400);
+ assert.equal((await page.request.post(`${baseUrl}/api/report?year=2026`)).status(),405);
  await page.route('**/api/report*',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Test database connection failure'})}));
  await page.locator('#refresh').click();await page.locator('#error').waitFor();assert.equal(await page.locator('#export').isDisabled(),true);assert.equal(await page.locator('#issued').textContent(),'—');
  console.log('PASS: live data, drill-down/up, filters, date range, CSV, empty state, FLV group only, chart interaction, mobile layout, secret isolation, validation, error state.');
