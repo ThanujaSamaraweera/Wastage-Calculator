@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildReport, percentage } from '../public/report.js';
+import { buildReport, percentage, generateCsvRows } from '../public/report.js';
 const row=(month,issued,waste,extra={})=>({item:'PMENVTEST',description:'Envelope',flvGroup:'ENV',site:'BTI',month,issued,waste,transactions:1,...extra});
 test('cumulative uses running totals, including months with no waste',()=>{
   const r=buildReport([row(1,148000,0),row(2,75140,24558),row(3,170920,19480)],{year:2026,from:1,to:3});
@@ -28,4 +28,42 @@ test('categories and no matching records',()=>{
  const r=buildReport([row(1,100,10,{flvGroup:'Tea'})],{year:2026,category:'Tea'});assert.equal(r.items[0].category,'Tea');
  assert.equal(buildReport([],{year:2026}).totals.percent,null);
 });
+
+test('generateCsvRows exports according to collapsed or expanded state', () => {
+  const rows = [
+    row(1, 1000, 100, { item: 'ITEM1', description: 'Desc 1', flvGroup: 'GRP1' }),
+    row(2, 2000, 200, { item: 'ITEM1', description: 'Desc 1', flvGroup: 'GRP1' }),
+    row(1, 300, 30, { item: 'ITEM2', description: 'Desc 2', flvGroup: 'GRP2' }),
+    row(2, 400, 40, { item: 'ITEM2', description: 'Desc 2', flvGroup: 'GRP2' }),
+  ];
+  const report = buildReport(rows, { year: 2026, from: 1, to: 2 });
+  assert.equal(report.items.length, 2);
+
+  // 1. All collapsed: should output header + 1 summary row per item (2 rows)
+  const collapsedCsv = generateCsvRows(report.items, new Set(), 2026);
+  assert.equal(collapsedCsv.length, 3); // 1 header + 2 item rows
+  assert.deepEqual(collapsedCsv[0], ['FLV group', 'Item', 'Description', 'Year', 'Month', 'Issued qty', 'Wastage qty', 'Wastage %', 'Cumulative %']);
+  assert.equal(collapsedCsv[1][4], 'All selected');
+  assert.equal(collapsedCsv[2][4], 'All selected');
+
+  // 2. Only ITEM1 expanded: ITEM1 has summary row + 2 month rows (3 rows), ITEM2 has summary row (1 row) -> total 1 + 3 + 1 = 5 rows
+  const oneExpandedCsv = generateCsvRows(report.items, new Set(['ITEM1']), 2026);
+  assert.equal(oneExpandedCsv.length, 5);
+  // First item summary
+  assert.equal(oneExpandedCsv[1][1], 'ITEM1');
+  assert.equal(oneExpandedCsv[1][4], 'All selected');
+  // First item months
+  assert.equal(oneExpandedCsv[2][1], 'ITEM1');
+  assert.equal(oneExpandedCsv[2][4], 'Jan');
+  assert.equal(oneExpandedCsv[3][1], 'ITEM1');
+  assert.equal(oneExpandedCsv[3][4], 'Feb');
+  // Second item summary (collapsed)
+  assert.equal(oneExpandedCsv[4][1], 'ITEM2');
+  assert.equal(oneExpandedCsv[4][4], 'All selected');
+
+  // 3. Both expanded: each has summary row + 2 month rows -> total 1 + 3 + 3 = 7 rows
+  const allExpandedCsv = generateCsvRows(report.items, new Set(['ITEM1', 'ITEM2']), 2026);
+  assert.equal(allExpandedCsv.length, 7);
+});
+
 

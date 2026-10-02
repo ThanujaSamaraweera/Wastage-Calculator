@@ -1,4 +1,4 @@
-import { buildReport } from './report.js';
+import { buildReport, generateCsvRows } from './report.js';
 const $ = id => document.getElementById(id);
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const number = new Intl.NumberFormat('en-US', {maximumFractionDigits:2});
@@ -128,11 +128,10 @@ function focusMonth(event) {const hit=event.target.closest('[data-month]');if(!h
 $('trend-chart').addEventListener('click',focusMonth);$('trend-chart').addEventListener('keydown',focusMonth);
 $('export').addEventListener('click',()=>{
   if(!report)return;
-  const csv=[['FLV group','Item','Description','Year','Month','Issued qty','Wastage qty','Wastage %','Cumulative %']];
-  for(const item of orderedItems()) for(const m of item.months) csv.push([item.category,item.item,item.description,report.year,months[m.month-1],m.issued,m.waste,m.percent??'N/A',m.cumulative??'N/A']);
+  const csv = generateCsvRows(orderedItems(), expanded, report.year, months);
   const cell=v=>`"${(typeof v==='string'&&/^[\s]*[=+@\-]/.test(v)?`'${v}`:String(v)).replaceAll('"','""')}"`;
   const blob=new Blob(['\uFEFF'+csv.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}), url=URL.createObjectURL(blob), link=document.createElement('a');
-  link.href=url;link.download=`basilur-wastage-${report.year}-${report.from}-${report.to}.csv`;link.click();showToast(`Exported ${report.items.length} materials with monthly details.`);setTimeout(()=>URL.revokeObjectURL(url),1000);
+  link.href=url;link.download=`basilur-wastage-${report.year}-${report.from}-${report.to}.csv`;link.click();showToast(`Exported ${report.items.length} materials (${csv.length - 1} rows) based on table view.`);setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
 
 function showToast(message) {

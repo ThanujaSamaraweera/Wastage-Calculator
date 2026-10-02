@@ -26,7 +26,7 @@ The server defaults to localhost. There is no application login. Before exposing
 - Expand an item with + to see monthly rows; collapse with − or use the global expand/collapse buttons.
 - Select a month in the quantities chart to focus the report. Reset restores the complete selected year and clears search/category/site filters.
 - Click column headings to sort. Pagination displays 30 materials per page; totals and charts always cover every filtered material.
-- Export CSV downloads all filtered materials and their month rows, across every page, regardless of expansion state.
+- Export CSV downloads all filtered materials according to their expansion state in the table (collapsed materials export as a summary row, while expanded materials include their summary row followed by monthly detail rows).
 - Refresh bypasses the five-minute data cache. Updates are reflected only after refresh or the next data request after expiry.
 
 ## Calculations and source rules
