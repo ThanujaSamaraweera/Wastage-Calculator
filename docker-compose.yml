@@ -1,3 +1,5 @@
+name: wastage-calculator
+
 services:
   app-wastage-calculator:
     build:
